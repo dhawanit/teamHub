@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./teamhub-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://teamhub_user:test@postgres:5432/teamhub_db
+    networks:
+      - teamhub-net
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./teamhub-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - teamhub-net
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: teamhub_db
+      POSTGRES_USER: teamhub_user
+      POSTGRES_PASSWORD: test
+    volumes:
+      - ./pgsdump.sql:/docker-entrypoint-initdb.d/pgsdump.sql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - teamhub-net
+    restart: on-failure
+
+networks:
+  teamhub-net:
+    driver: bridge
