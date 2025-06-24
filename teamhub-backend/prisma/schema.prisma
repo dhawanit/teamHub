@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teams           TeamMember[]
+  createdProjects Project[]    @relation("UserCreatedProjects")
+  createdTeams    Team[]       @relation("UserCreatedTeams")
+
+  createdTasks  Task[]        @relation("TaskCreator")
+  assignedTasks Task[]        @relation("TaskAssignee")
+  taskHistories TaskHistory[]
+  comments      Comment[]
+
+  invitedMembers  TeamMember[] @relation("InvitedMembers")
+}
+
+model Team {
+  id        String       @id @default(uuid())
+  name      String       @unique
+  createdAt DateTime     @default(now())
+  createdBy String
+  creator   User         @relation("UserCreatedTeams", fields: [createdBy], references: [id])
+  members   TeamMember[]
+  projects  Project[]
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model TeamMember {
+  id     String           @id @default(uuid())
+  teamId String
+  userId String
+  invitedBy String?          
+  inviter User?        @relation("InvitedMembers", fields: [invitedBy], references: [id])
+  status InvitationStatus @default(PENDING)
+  team   Team             @relation(fields: [teamId], references: [id])
+  user   User             @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  teamId      String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks   Task[]
+  team    Team?  @relation(fields: [teamId], references: [id])
+  creator User   @relation("UserCreatedProjects", fields: [createdBy], references: [id])
+
+  @@unique([name, teamId])
+}
+
+enum TaskStatus {
+  TODO
+  INPROGRESS
+  DONE
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  dueDate     DateTime?
+  createdBy   String
+  assigneeId  String?
+  projectId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project  Project @relation(fields: [projectId], references: [id])
+  creator  User    @relation("TaskCreator", fields: [createdBy], references: [id])
+  assignee User?   @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  comments Comment[]
+  history  TaskHistory[]
+}
+
+model TaskHistory {
+  id         String      @id @default(uuid())
+  taskId     String
+  changedBy  String
+  fromStatus TaskStatus?
+  toStatus   TaskStatus
+  changedAt  DateTime    @default(now())
+
+  task Task @relation(fields: [taskId], references: [id])
+  user User @relation(fields: [changedBy], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  taskId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}
