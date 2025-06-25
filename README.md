@@ -33,11 +33,11 @@ TeamHub is a lightweight, collaborative project management system — built to h
 
 ```
 TeamHub/
-├── Backend/
+├── teamhub-backend/
 │ ├── Express.js
 │ ├── Prisma
 │ └── .env
-├── Backend/
+├── teamhub-frontend/
 │ ├── React.js
 │ ├── Vite
 │ ├── MUI
@@ -60,7 +60,7 @@ TeamHub/
 ## ⚙️ Backend Setup (Manual)
 
 ```bash
-cd backend
+cd teamhub-backend
 ``` 
 ##
 ## 1. Install Dependencies
@@ -95,6 +95,7 @@ npm run dev
 
 ## 1. Install dependencies
 ```
+cd teamhub-frontend
 npm install
 ```
 
@@ -116,7 +117,36 @@ npm run dev
 ```
 ---
 ## 🐳 Docker Setup (Recommended)
-## 1. One-click setup
+## 1. Clone Repository
+For https:
+```
+git clone https://github.com/dhawanit/teamHub.git
+``` 
+For SSH:
+```
+git clone git@github.com:dhawanit/teamHub.git
+```
+---
+## 2. Setup .env
+> NOTE: Use this .env for docker setup only
+```
+cd teamhub-backend
+cp .env.example .env
+```
+> Update .env
+```
+DATABASE_URL="postgresql://teamhub_user:test@postgres:5433/teamhub_db"
+JWT_SECRET="nbd2j5jbwjkdk2j4bbk"
+JWT_EXPIRES_IN="3600s"
+PORT=3000
+```
+> Update .env in teamhub-frontend
+```
+cd teamhub-frontend
+cp .env.example .env
+```
+
+## 3. One-click setup
 ```
 docker-compose build
 docker-compose up -d
@@ -124,7 +154,7 @@ docker-compose up -d
 
 ---------------
 
-## 2. Access URLs
+## 4. Access URLs
 **Frontend:** http://localhost:5173
 
 **Backend:** http://localhost:3000
