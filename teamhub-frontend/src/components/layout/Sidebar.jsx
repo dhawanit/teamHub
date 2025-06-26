@@ -104,7 +104,6 @@ const Sidebar = ({ open, toggleOpen }) => {
             { label: 'Create Project', icon: <AddCircleOutline fontSize="small" />, path: '/projects/create' },
             { label: 'Assign to Team', icon: <LinkIcon fontSize="small" />, path: '/projects/assign' },
             { label: 'Update Project', icon: <Edit fontSize="small" />, path: '/projects/update' },
-            { label: 'Delete Project', icon: <Delete fontSize="small" />, path: '/projects/delete' },
             { label: 'Projects by Team', icon: <PeopleAlt fontSize="small" />, path: '/projects/team' }
           ].map((item, idx) => (
             <ListItemButton
